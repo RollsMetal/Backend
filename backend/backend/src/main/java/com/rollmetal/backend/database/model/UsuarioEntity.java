@@ -2,6 +2,7 @@
 package com.rollmetal.backend.database.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 @Entity
@@ -25,5 +26,6 @@ public class UsuarioEntity {
     private String email;
 
     @Column(name = "senha", nullable = false, length = 255)
+    @JsonIgnore
     private String senha;
 }

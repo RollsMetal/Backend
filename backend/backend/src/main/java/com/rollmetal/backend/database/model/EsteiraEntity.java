@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "esteiras")
+@Table(name = "esteiras", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_esteiras_numero_serial", columnNames = "NumeroSerial")
+})
 @Getter
 @Setter
 @Builder
@@ -15,7 +17,7 @@ public class EsteiraEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id_esteira;
+    private Long idEsteira;
 
     @Column(name = "NumeroSerial", nullable = false, length = 100)
     private String numeroSerial;

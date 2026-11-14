@@ -9,7 +9,7 @@ import lombok.*;
 @Table(
         name = "sensores",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"esteira_id", "porta"})
+                @UniqueConstraint(name = "uk_sensores_esteira_porta", columnNames = {"esteira_id", "porta"})
         }
 )
 @Getter
@@ -24,13 +24,16 @@ public class SensorEntity {
     @Column(name = "id_Sensor")
     private Long idSensor;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "esteira_id", nullable = false)
     private EsteiraEntity esteira;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Tipo", nullable = false, length = 100)
+    @Column(name = "tipo", nullable = false, length = 100)
     private TipoSensor tipoSensor;
+
+    @Column(name = "modelo", length = 50)
+    private String modelo;
 
     @Column(name = "porta", nullable = false)
     private Short porta;

@@ -1,4 +1,12 @@
 package com.rollmetal.backend.dto.sensor;
 
-public class SensorRequestDTO {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
+public record SensorRequestDTO(
+        @NotNull @Positive Short porta,
+        @NotBlank @Size(max = 50) String modelo
+) {
 }
