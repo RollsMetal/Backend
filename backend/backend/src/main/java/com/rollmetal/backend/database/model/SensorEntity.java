@@ -3,7 +3,11 @@ package com.rollmetal.backend.database.model;
 
 import com.rollmetal.backend.enums.TipoSensor;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
@@ -13,10 +17,9 @@ import lombok.*;
         }
 )
 @Getter
-@Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class SensorEntity {
 
     @Id
@@ -38,4 +41,8 @@ public class SensorEntity {
     @Column(name = "porta", nullable = false)
     private Short porta;
 
+    public void atualizarIdentificacao(String modelo, TipoSensor tipoSensor) {
+        this.modelo = modelo;
+        this.tipoSensor = tipoSensor;
+    }
 }

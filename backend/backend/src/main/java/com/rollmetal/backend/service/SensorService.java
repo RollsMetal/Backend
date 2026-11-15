@@ -5,20 +5,17 @@ import com.rollmetal.backend.database.repository.EsteiraRepository;
 import com.rollmetal.backend.database.repository.SensorRepository;
 import com.rollmetal.backend.dto.sensor.SensorResponseDTO;
 import com.rollmetal.backend.exception.RecursoNaoEncontradoException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class SensorService {
     private final EsteiraRepository esteiraRepository;
     private final SensorRepository sensorRepository;
-
-    public SensorService(EsteiraRepository esteiraRepository, SensorRepository sensorRepository) {
-        this.esteiraRepository = esteiraRepository;
-        this.sensorRepository = sensorRepository;
-    }
 
     @Transactional(readOnly = true)
     public List<SensorResponseDTO> listarPorEsteira(String numeroSerial) {

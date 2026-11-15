@@ -3,7 +3,11 @@ package com.rollmetal.backend.database.model;
 import com.rollmetal.backend.enums.TipoMaterial;
 import com.rollmetal.backend.enums.TipoSensor;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
 
@@ -12,10 +16,9 @@ import java.time.OffsetDateTime;
         @Index(name = "idx_sensor_leituras_sensor_data", columnList = "sensor_id, data")
 })
 @Getter
-@Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class SensorLeitura {
 
     @Id

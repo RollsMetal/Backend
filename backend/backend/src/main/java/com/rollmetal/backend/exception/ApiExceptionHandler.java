@@ -29,12 +29,6 @@ public class ApiExceptionHandler {
         return response(HttpStatus.NOT_FOUND, exception.getMessage(), request, Map.of());
     }
 
-    @ExceptionHandler(IntegracaoNaoAutorizadaException.class)
-    public ResponseEntity<ApiErrorResponse> integracaoNaoAutorizada(
-            IntegracaoNaoAutorizadaException exception, HttpServletRequest request) {
-        return response(HttpStatus.UNAUTHORIZED, exception.getMessage(), request, Map.of());
-    }
-
     @ExceptionHandler(ModeloSensorNaoSuportadoException.class)
     public ResponseEntity<ApiErrorResponse> modeloNaoSuportado(
             ModeloSensorNaoSuportadoException exception, HttpServletRequest request) {

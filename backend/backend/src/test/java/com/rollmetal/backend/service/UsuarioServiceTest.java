@@ -25,8 +25,12 @@ class UsuarioServiceTest {
         when(encoder.encode("SenhaSegura123")).thenReturn("$2a$12$hash");
         when(repository.save(any())).thenAnswer(invocation -> {
             UsuarioEntity entity = invocation.getArgument(0);
-            entity.setId(9L);
-            return entity;
+            return UsuarioEntity.builder()
+                    .id(9L)
+                    .nome(entity.getNome())
+                    .email(entity.getEmail())
+                    .senha(entity.getSenha())
+                    .build();
         });
 
         var resposta = service.cadastrar(new UsuarioRequestDTO(

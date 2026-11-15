@@ -1,17 +1,20 @@
 package com.rollmetal.backend.database.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "esteiras", uniqueConstraints = {
         @UniqueConstraint(name = "uk_esteiras_numero_serial", columnNames = "NumeroSerial")
 })
 @Getter
-@Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class EsteiraEntity {
 
     @Id

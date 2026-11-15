@@ -11,8 +11,8 @@
 	<groupId>com.rollmetal</groupId>
 	<artifactId>backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<name>RollsMetal Backend</name>
+	<description>API REST para esteiras industriais e leituras de sensores IO-Link.</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -27,7 +27,10 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>25</java.version>
+		<maven.compiler.release>${java.version}</maven.compiler.release>
+		<maven.compiler.parameters>true</maven.compiler.parameters>
+		<springdoc.version>3.2.0</springdoc.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -40,12 +43,16 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>3.2.0</version>
+			<version>${springdoc.version}</version>
 		</dependency>
 
 		<dependency>

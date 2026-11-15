@@ -9,10 +9,11 @@ import com.rollmetal.backend.database.repository.SensorRepository;
 import com.rollmetal.backend.dto.leitura.SensorLeituraRequestDTO;
 import com.rollmetal.backend.dto.leitura.SensorLeituraResponseDTO;
 import com.rollmetal.backend.dto.leitura.SensorLeiturasPageResponseDTO;
+import com.rollmetal.backend.enums.TipoMaterial;
 import com.rollmetal.backend.enums.TipoSensor;
-import com.rollmetal.backend.exception.ConflitoDeConfiguracaoException;
 import com.rollmetal.backend.exception.RecursoNaoEncontradoException;
 import com.rollmetal.backend.exception.RequisicaoInvalidaException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -25,24 +26,13 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class SensorLeituraService {
     private final EsteiraRepository esteiraRepository;
     private final SensorRepository sensorRepository;
     private final SensorLeituraRepository leituraRepository;
     private final CatalogoModeloSensor catalogoModeloSensor;
     private final ClassificadorMaterial classificadorMaterial;
-
-    public SensorLeituraService(EsteiraRepository esteiraRepository,
-                                SensorRepository sensorRepository,
-                                SensorLeituraRepository leituraRepository,
-                                CatalogoModeloSensor catalogoModeloSensor,
-                                ClassificadorMaterial classificadorMaterial) {
-        this.esteiraRepository = esteiraRepository;
-        this.sensorRepository = sensorRepository;
-        this.leituraRepository = leituraRepository;
-        this.catalogoModeloSensor = catalogoModeloSensor;
-        this.classificadorMaterial = classificadorMaterial;
-    }
 
     @Transactional
     public List<SensorLeituraResponseDTO> registrarLeituras(
@@ -70,15 +60,21 @@ public class SensorLeituraService {
     }
 
     @Transactional(readOnly = true)
-    public SensorLeiturasPageResponseDTO listarPorEsteira(String numeroSerial, int pagina, int tamanho) {
+    public SensorLeiturasPageResponseDTO listarPorEsteira(
+            String numeroSerial, int pagina, int tamanho, Long sensorId, Short porta,
+            TipoMaterial tipoMaterial, OffsetDateTime dataInicio, OffsetDateTime dataFim) {
         if (pagina < 0 || tamanho < 1 || tamanho > 100) {
             throw new RequisicaoInvalidaException("A página deve ser não negativa e o tamanho deve estar entre 1 e 100.");
+        }
+        if (dataInicio != null && dataFim != null && dataInicio.isAfter(dataFim)) {
+            throw new RequisicaoInvalidaException("dataInicio deve ser anterior ou igual a dataFim.");
         }
         EsteiraEntity esteira = esteiraRepository.findByNumeroSerial(numeroSerial)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Esteira não encontrada para o número serial informado."));
         Page<SensorLeitura> resultado = leituraRepository.buscarHistoricoDaEsteira(
-                esteira.getIdEsteira(), PageRequest.of(pagina, tamanho));
+                esteira.getIdEsteira(), sensorId, porta, tipoMaterial, dataInicio, dataFim,
+                PageRequest.of(pagina, tamanho));
         return new SensorLeiturasPageResponseDTO(
                 resultado.getContent().stream().map(this::paraResponse).toList(),
                 resultado.getNumber(), resultado.getSize(), resultado.getTotalElements(), resultado.getTotalPages());
@@ -93,8 +89,7 @@ public class SensorLeituraService {
                         .esteira(esteira)
                         .porta(entrada.porta())
                         .build());
-        sensor.setModelo(modeloCanonico);
-        sensor.setTipoSensor(tipoSensor);
+        sensor.atualizarIdentificacao(modeloCanonico, tipoSensor);
         sensor = sensorRepository.save(sensor);
 
         SensorLeitura leitura = SensorLeitura.builder()

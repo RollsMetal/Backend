@@ -6,15 +6,22 @@ import com.rollmetal.backend.dto.esteira.EsteiraRequestDTO;
 import com.rollmetal.backend.dto.esteira.EsteiraResponseDTO;
 import com.rollmetal.backend.exception.ConflitoDeConfiguracaoException;
 import com.rollmetal.backend.exception.RecursoNaoEncontradoException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
+@RequiredArgsConstructor
 public class EsteiraService {
     private final EsteiraRepository esteiraRepository;
 
-    public EsteiraService(EsteiraRepository esteiraRepository) {
-        this.esteiraRepository = esteiraRepository;
+    @Transactional(readOnly = true)
+    public List<EsteiraResponseDTO> listar() {
+        return esteiraRepository.findAllByOrderByNumeroSerialAsc().stream()
+                .map(this::paraResponse)
+                .toList();
     }
 
     @Transactional
