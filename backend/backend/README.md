@@ -43,6 +43,18 @@ O padrão de `JPA_DDL_AUTO` é `validate`. Use `update` apenas em desenvolviment
 | `GET /api/esteiras/{numeroSerial}/leituras` | Consulta histórico paginado com filtros opcionais. |
 | `POST /api/integracao/esteiras/{numeroSerial}/leituras` | Recebe leituras em lote do Node-RED. |
 | `POST /api/usuarios` | Cadastra um usuário. |
+| `POST /api/usuarios/login` | Valida e-mail e senha cadastrados e retorna os dados públicos do usuário. |
+
+Exemplo de login:
+
+```http
+POST /api/usuarios/login
+Content-Type: application/json
+
+{"email":"operador@rollsmetal.com","senha":"SenhaSegura123"}
+```
+
+Credenciais válidas retornam `200 OK` com `id`, `nome` e `email`. E-mail inexistente ou senha incorreta retornam `401 Unauthorized` com a mensagem `E-mail ou senha inválidos.`.
 
 O histórico aceita `pagina` (inicia em zero), `tamanho` (1–100), `sensorId`, `porta`, `tipoMaterial`, `dataInicio` e `dataFim`. Datas usam ISO-8601; os dois limites são inclusivos. Exemplo:
 
@@ -68,7 +80,7 @@ O Actuator expõe somente saúde, sem detalhes dos componentes. Restrinja Swagge
 
 Não há autenticação ou autorização implementada. A ingestão do Node-RED também não exige token nesta versão; mantenha a API em uma rede confiável e use TLS no tráfego implantado.
 
-O cadastro atual recebe `senha` e a armazena com BCrypt, mas não existe login que a utilize. Mantive o hash para preservar o contrato atual e a coluna obrigatória do banco; nunca armazene essa senha em texto puro. Se o cadastro deixar de precisar dela, remova o campo por uma mudança versionada da API e uma migração revisada do schema.
+O cadastro recebe `senha` e a armazena com BCrypt. O login apenas valida as credenciais e devolve os dados públicos do usuário; não emite token nem cria sessão. Nenhuma rota exige login. Nunca armazene a senha em texto puro.
 
 ## Modelos e classificação
 

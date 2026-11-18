@@ -2,8 +2,10 @@ package com.rollmetal.backend.service;
 
 import com.rollmetal.backend.database.model.UsuarioEntity;
 import com.rollmetal.backend.database.repository.UsuarioRepository;
+import com.rollmetal.backend.dto.usuario.UsuarioLoginRequestDTO;
 import com.rollmetal.backend.dto.usuario.UsuarioRequestDTO;
 import com.rollmetal.backend.dto.usuario.UsuarioResponseDTO;
+import com.rollmetal.backend.exception.CredenciaisInvalidasException;
 import com.rollmetal.backend.exception.EmailJaCadastradoException;
 import com.rollmetal.backend.exception.RequisicaoInvalidaException;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,23 @@ public class UsuarioService {
                 .email(email)
                 .senha(passwordEncoder.encode(request.senha()))
                 .build());
+        return new UsuarioResponseDTO(usuario.getId(), usuario.getNome(), usuario.getEmail());
+    }
+
+    @Transactional(readOnly = true)
+    public UsuarioResponseDTO login(UsuarioLoginRequestDTO request) {
+        if (request.senha().getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw new CredenciaisInvalidasException();
+        }
+
+        String email = request.email().strip().toLowerCase(Locale.ROOT);
+        UsuarioEntity usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(CredenciaisInvalidasException::new);
+
+        if (!passwordEncoder.matches(request.senha(), usuario.getSenha())) {
+            throw new CredenciaisInvalidasException();
+        }
+
         return new UsuarioResponseDTO(usuario.getId(), usuario.getNome(), usuario.getEmail());
     }
 }

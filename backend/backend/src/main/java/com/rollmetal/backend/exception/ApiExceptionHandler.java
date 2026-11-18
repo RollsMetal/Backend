@@ -41,6 +41,12 @@ public class ApiExceptionHandler {
         return response(HttpStatus.BAD_REQUEST, exception.getMessage(), request, Map.of());
     }
 
+    @ExceptionHandler(CredenciaisInvalidasException.class)
+    public ResponseEntity<ApiErrorResponse> credenciaisInvalidas(
+            CredenciaisInvalidasException exception, HttpServletRequest request) {
+        return response(HttpStatus.UNAUTHORIZED, "E-mail ou senha inválidos.", request, Map.of());
+    }
+
     @ExceptionHandler({ConflitoDeConfiguracaoException.class, EmailJaCadastradoException.class,
             DataIntegrityViolationException.class})
     public ResponseEntity<ApiErrorResponse> conflito(RuntimeException exception, HttpServletRequest request) {

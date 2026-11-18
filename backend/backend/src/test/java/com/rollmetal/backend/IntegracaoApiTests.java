@@ -189,6 +189,52 @@ class IntegracaoApiTests {
     }
 
     @Test
+    void cadastraEValidaCredenciaisComLoginSemExporSenhaOuProtegerOutrasRotas() throws Exception {
+        http.perform(post("/api/usuarios").contentType(MediaType.APPLICATION_JSON).content("""
+                {"nome":"Operador Login","email":"Operador.Login@RollsMetal.com","senha":"SenhaSegura123"}
+                """))
+                .andExpect(status().isCreated());
+
+        String usuario = http.perform(post("/api/usuarios/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":" Operador.Login@RollsMetal.com ","senha":"SenhaSegura123"}
+                                """))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        assertTrue(JsonPath.<Integer>read(usuario, "$.id") > 0);
+        assertEquals("Operador Login", JsonPath.read(usuario, "$.nome"));
+        assertEquals("operador.login@rollsmetal.com", JsonPath.read(usuario, "$.email"));
+        assertFalse(usuario.contains("senha"));
+        assertFalse(usuario.contains("SenhaSegura123"));
+
+        String senhaIncorreta = http.perform(post("/api/usuarios/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"operador.login@rollsmetal.com","senha":"SenhaErrada123"}
+                                """))
+                .andExpect(status().isUnauthorized())
+                .andReturn().getResponse().getContentAsString();
+        assertEquals("E-mail ou senha inválidos.", JsonPath.read(senhaIncorreta, "$.message"));
+        assertEquals("/api/usuarios/login", JsonPath.read(senhaIncorreta, "$.path"));
+        assertEquals("Unauthorized", JsonPath.read(senhaIncorreta, "$.error"));
+        assertEquals("{}", JsonPath.read(senhaIncorreta, "$.validationErrors").toString());
+
+        String emailInexistente = http.perform(post("/api/usuarios/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"nao.existe@rollsmetal.com","senha":"SenhaSegura123"}
+                                """))
+                .andExpect(status().isUnauthorized())
+                .andReturn().getResponse().getContentAsString();
+        assertEquals(JsonPath.<String>read(senhaIncorreta, "$.message"),
+                JsonPath.<String>read(emailInexistente, "$.message"));
+
+        http.perform(get("/api/esteiras")).andExpect(status().isOk());
+    }
+
+    @Test
     void filtraHistoricoPorSensorPortaMaterialEPeriodo() throws Exception {
         http.perform(post("/api/esteiras").contentType(MediaType.APPLICATION_JSON).content("""
                 {"numeroSerial":"RM-HTTP-10"}
@@ -235,6 +281,7 @@ class IntegracaoApiTests {
         assertTrue(especificacao.contains("RollsMetal Backend API"));
         assertTrue(especificacao.contains("/api/esteiras"));
         assertTrue(especificacao.contains("/api/integracao/esteiras/{numeroSerial}/leituras"));
+        assertTrue(especificacao.contains("/api/usuarios/login"));
         assertTrue(especificacao.contains("dataInicio"));
 
         http.perform(get("/swagger-ui.html"))
